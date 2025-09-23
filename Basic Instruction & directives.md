@@ -65,7 +65,50 @@ L6  dd 1A92h       ; double word initialized to hex 1A92
 L7  db "A"         ; byte initialized to ASCII 65
 ```
 
+# Mapping of Format Specifiers to Assembly
+| Format | C Meaning                      | Bytes Expected | NASM Directive | Example            |
+| ------ | ------------------------------ | -------------- | -------------- | ------------------ |
+| `%d`   | int (usually 32-bit)           | 4              | `dd`           | `num dd 0`         |
+| `%ld`  | long int (64-bit on Linux x64) | 8              | `dq`           | `num dq 0`         |
+| `%lld` | long long (also 64-bit here)   | 8              | `dq`           | `num dq 0`         |
+| `%c`   | char (1 byte)                  | 1              | `db`           | `ch db 0`          |
+| `%s`   | string (array of chars)        | varies         | `db ... ,0`    | `msg db "Hello",0` |
+| `%f`   | float (32-bit)                 | 4              | `dd`           | `flt dd 0.0`       |
+| `%lf`  | double (64-bit)                | 8              | `dq`           | `dbl dq 0.0`       |
 
+## LEA (Load Effective Address)
 
+The `lea` instruction loads the *address* of a memory operand into a register, **not the value** stored there.
 
+### Why we need it?
+- Sometimes we want to pass the *address* of a variable (e.g., to `scanf`, which needs a pointer).
+- Useful for pointer arithmetic without actually touching memory.
+- Saves instructions compared to doing manual `mov` and `add`.
+
+### Syntax
+
+- `destination`: register (where the computed address goes).
+- `[source]`: a memory operand (brackets required).
+
+### Example 1 – Address for `scanf`
+```asm
+num dq 0          ; 8 bytes reserved
+
+mov rdi, in_fmt   ; "%ld"
+lea rsi, [num]    ; rsi = &num (address of num)
+call scanf        ; scanf("%ld", &num)
+```
+### Example-2 -Pointer arithmetic 
+``` asm
+lea rax, [rbx+4*rcx]
+```
+This calculates rbx + (4*rcx) and stores it in rax.Here,no memory access happens – only the calculated address is loaded.
+
+### When to use `lea` vs `mov`
+* Use `mov` when you want the value at an address.
+* Use `lea` when you want the address itself.
+``` asm
+mov rax, [var]   ; rax = value stored at var
+lea rax, [var]   ; rax = address of var
+```
 
