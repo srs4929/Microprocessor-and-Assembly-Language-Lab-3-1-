@@ -92,3 +92,10 @@ mov rax,0 → sets return value = 0 (like return 0 in C).
 ret → returns control to the caller.
 
 Cleans up the stack and follows standard x86-64 calling conventions.
+
+## Command for running file
+```
+nasm -f elf64 print.asm -o print
+gcc -no-pie print.o -o print
+./print
+```
