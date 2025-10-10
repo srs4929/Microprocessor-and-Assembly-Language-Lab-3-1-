@@ -54,3 +54,73 @@ end_if:
 | `jl`        | Jump if less             | `<`             |
 | `jge`       | Jump if greater or equal | `>=`            |
 | `jle`       | Jump if less or equal    | `<=`            |
+
+## Example
+``` asm
+; Write a NASM program that checks if a number is positive, negative, or zero and prints an appropriate message.
+
+extern scanf
+extern printf
+
+section .data
+
+num : dq 0
+enter_msg: db "Enter a number",10,0
+input: db "%ld",0
+result: dq 0
+positive: db "The number %ld is positive",10,0
+negative: db "The number %ld is negative",10,0
+zero: db "The number %ld is zero",10,0
+
+section .text
+global main
+main:
+push rbp
+mov rbp,rsp
+and rsp,-16
+
+mov rdi,enter_msg
+xor rax,rax
+call printf
+
+mov rdi,input
+lea rsi,[num]
+xor rax,rax
+call scanf
+
+mov rax,[num]
+
+cmp rax,0
+je pt_zero
+jg pt_positive
+jl pt_negative
+
+pt_positive:
+
+mov rdi,positive
+mov rsi,rax
+xor rax,rax
+call printf
+jmp end
+
+pt_negative:
+
+mov rdi,negative
+mov rsi,rax
+xor rax,rax
+call printf
+jmp end 
+
+pt_zero:
+mov rdi,zero
+mov rsi,rax
+xor rax,rax
+call printf
+jmp end
+
+end:
+mov rsp,rbp
+pop rbp
+mov rax,0
+ret
+```
